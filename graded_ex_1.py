@@ -1,72 +1,31 @@
-# Products available in the store by category
-products = {
-    "IT Products": [
-        ("Laptop", 1000),
-        ("Smartphone", 600),
-        ("Headphones", 150),
-        ("Keyboard", 50),
-        ("Monitor", 300),
-        ("Mouse", 25),
-        ("Printer", 120),
-        ("USB Drive", 15)
-    ],
-    "Electronics": [
-        ("Smart TV", 800),
-        ("Bluetooth Speaker", 120),
-        ("Camera", 500),
-        ("Smartwatch", 200),
-        ("Home Theater", 700),
-        ("Gaming Console", 450)
-    ],
-    "Groceries": [
-        ("Milk", 2),
-        ("Bread", 1.5),
-        ("Eggs", 3),
-        ("Rice", 10),
-        ("Chicken", 12),
-        ("Fruits", 6),
-        ("Vegetables", 5),
-        ("Snacks", 8)
-    ]
-}
+import pandas as pd
 
-
-def display_sorted_products(products_list, sort_order):
-    pass
-
-
-def display_products(products_list):
-    pass
-
-
-def display_categories():
-    pass
-
-
-def add_to_cart(cart, product, quantity):
-    pass
-
-def display_cart(cart):
-    pass
-
-
-def generate_receipt(name, email, cart, total_cost, address):
-    pass
-
-
-def validate_name(name):
-    pass
-
-def validate_email(email):
-    pass
-
-
-def main():
-    pass
+class DataAnalysis:
+    def __init__(self, file_path):
+        self.data = pd.read_csv(file_path)
     
+    def select_variable(self, variable_name):
+        """选择指定变量"""
+        if variable_name in self.data.columns:
+            return self.data[variable_name]
+        else:
+            raise ValueError("变量不存在")
 
-""" The following block makes sure that the main() function is called when the program is run. 
-It also checks that this is the module that's being run directly, and not being used as a module in some other program. 
-In that case, only the part that's needed will be executed and not the entire program """
-if __name__ == "__main__":
-    main()
+    def check_normality(self, variable_name):
+        """检查指定变量的正态性"""
+        from scipy import stats
+        _, p_value = stats.shapiro(self.data[variable_name])
+        return p_value >= 0.05  # 如果p值>=0.05，则为正态分布
+
+    def hypothesis_test_anova(self, group_col, target_col):
+        """进行ANOVA检验"""
+        from scipy import stats
+        groups = [group[1][target_col].values for group in self.data.groupby(group_col)]
+        return stats.f_oneway(*groups)
+
+    def hypothesis_test_kruskal(self, group_col, target_col):
+        """进行Kruskal-Wallis检验"""
+        from scipy import stats
+        groups = [group[1][target_col].values for group in self.data.groupby(group_col)]
+        return stats.kruskal(*groups)
+
